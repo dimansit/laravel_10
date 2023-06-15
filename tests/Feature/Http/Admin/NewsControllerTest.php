@@ -45,9 +45,7 @@ class NewsControllerTest extends TestCase
             'status'      => 'DRAFT',
             'description' => fake()->text(100),
         ];
-
         $response = $this->post(route('admin.news.store'), $postData);
-
         $response->assertStatus(302);
     }
 }

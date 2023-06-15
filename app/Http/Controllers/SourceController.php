@@ -45,7 +45,7 @@ class SourceController extends Controller
         //]);
         $name = uniqid();
         file_put_contents("sourcefile/$name.txt", json_encode($request->only(['info', 'phone', 'email', 'info'])));
-        return redirect()->route('source.create', ['info' => 'Ваша заявка принята']);
+        return response()->json($request->all());
     }
 
     /**
