@@ -14,10 +14,13 @@ class NewsController extends Controller
      */
     public function index()
     {
+        $news = \DB::table('news')
+            ->join('categories', 'news.category_id', '=', 'categories.id')
+            ->select('news.*', 'categories.category as category')
+            ->get();
         return view('admin.news.news',
             [
-                'newsList'   => $this->getNews(),
-                'categories' => $this->getCategories()
+                'newsList' => $news,
             ]
         );
     }
@@ -30,8 +33,12 @@ class NewsController extends Controller
      */
     public function create()
     {
+        $categories = \DB::table('categories')->get();
+        $id = Request()->all()['id'] ?? 0;
+        $news = \DB::table('news')->find( $id);
         return view('admin.news.create', [
-            'categories' => $this->getCategories()
+            'categories' => $categories,
+            'news'       => $news ?? ''
         ]);
     }
 
@@ -43,7 +50,7 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-       // dd($request->all());
+        // dd($request->all());
         $request->validate([
             'title' => ['required', 'string'],
         ]);

@@ -25,7 +25,7 @@ class SourceController extends Controller
     public function create()
     {
         return view('source.create', [
-            'info' => Request()->all()['info']
+            'info' => Request()->all()['info'] ?? ''
         ]);
     }
 
