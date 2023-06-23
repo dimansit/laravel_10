@@ -2,10 +2,10 @@
 @section('title') Категории! @parent  @stop
 @section('headcontent') - Категории @parent  @stop
 @section('content')
-    @foreach ($categories as $id=>$cat)
+    @foreach ($categories as $cat)
         <a class="btn btn-sm btn-success"
            href="#">
-            {{$cat}}
+            {{$cat->category}}
         </a>
     @endforeach
 @stop

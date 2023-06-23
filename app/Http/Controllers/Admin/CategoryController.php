@@ -14,9 +14,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $categories = \DB::table('categories')->get();
         return view('admin.categories.categories',
             [
-                'categories' => $this->getCategories()
+                'categories' => $categories
             ]
         );
     }
