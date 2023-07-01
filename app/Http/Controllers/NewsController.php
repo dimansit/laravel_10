@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Queries\NewsQueryBuilder;
+use Illuminate\View\View;
+
 class NewsController extends Controller
 {
-    public function index()
+    public function index(NewsQueryBuilder $newsQueryBuilder): View
     {
-        $news = \DB::table('news')
-            ->join('categories', 'news.category_id', '=', 'categories.id')
-            ->select('news.*', 'categories.category as category')
-            ->get();
         return view('news.index',
             [
-                'newsList' => $news
+                'newsList' => $newsQueryBuilder->getActiveNews()
             ]
         );
     }

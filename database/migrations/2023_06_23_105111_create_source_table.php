@@ -17,7 +17,8 @@ return new class extends Migration
             $table->text('description');
             $table->string('url',150);
             $table->timestamp('create_at');
-            $table->string('user_create_id');
+            $table->timestamp('updated_at');
+            $table->integer('user_create_id');
 
             $table->index('user_create_id');
         });

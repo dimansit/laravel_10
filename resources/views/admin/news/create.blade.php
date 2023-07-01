@@ -7,11 +7,16 @@
             <x-alert type="danger" :message="$error"></x-alert>
         @endforeach
     @endif
-    <form method="POST" action="{{ route('admin.news.store') }}" enctype="multipart/form-data" style="width: 600px;">
+    <form method="POST"
+          action="{{ route( $news ? 'admin.news.update' : 'admin.news.store',[ 'news' => $news?:null]) }}"
+          enctype="multipart/form-data" style="width: 600px;">
         @csrf
+        @if($news)
+            @method('put')
+        @endif
         <div class="form-group">
-            <label class="control-label" for="category">Категория:</label>
-            <select class="form-control" id="category" name="category" aria-required="true">
+            <label class="control-label" for="category_id">Категория:</label>
+            <select class="form-control" id="category_id" name="category_id" aria-required="true">
                 <option value="0"> -</option>
                 @foreach($categories as $cat)
                     <option value="{{$cat->id}}"
@@ -32,7 +37,8 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="author">Автор новости</label>
-            <input class="form-control" id="author" value=" {{ $news ? $news->author : old('author') }}" name="author" aria-required="true">
+            <input class="form-control" id="author" value=" {{ $news ? $news->author : old('author') }}" name="author"
+                   aria-required="true">
         </div>
         <div class="form-group">
             <label class="control-label" for="status">Тип:</label>

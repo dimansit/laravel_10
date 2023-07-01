@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('category',100);
             $table->timestamp('create_at');
+            $table->timestamp('updated_at');
             $table->string('user_create_id');
 
             $table->index('user_create_id');

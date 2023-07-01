@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,13 +12,14 @@ return new class extends Migration
     {
         Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->string('title',300);
-            $table->string('author',150);
+            $table->string('title', 300);
+            $table->string('author', 150);
             $table->text('description');
-            $table->timestamp('create_at');
             $table->string('category_id');
             $table->string('source_id');
-            $table->string('user_create_id');
+            $table->integer('user_create_id');
+            $table->timestamp('create_at');
+            $table->timestamp('updated_at');
 
             $table->index('source_id');
             $table->index('user_create_id');
