@@ -3,22 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Queries\CategoriesQueryBuilder;
+use App\Models\Source;
+use App\Queries\NewsQueryBuilder;
 use App\Queries\QueryBuilder;
+use App\Queries\SourcesQueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class CategoryController extends Controller
+class SourceController extends Controller
 {
 
-    protected QueryBuilder $categoriesQueryBuilder;
+    protected QueryBuilder $sourcesQueryBuilder;
+    protected QueryBuilder $newsQueryBuilder;
 
     public function __construct(
-        CategoriesQueryBuilder $categoriesQueryBuilder,
+        SourcesQueryBuilder $sourcesQueryBuilder,
+        NewsQueryBuilder $newsQueryBuilder
     )
     {
-        $this->categoriesQueryBuilder = $categoriesQueryBuilder;
+        $this->sourcesQueryBuilder = $sourcesQueryBuilder;
+        $this->newsQueryBuilder = $newsQueryBuilder;
     }
 
     /**
@@ -26,14 +30,13 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() : View
+    public function index(): View
     {
-        return view('admin.categories.categories',
-            [
-                'categories' => $this->categoriesQueryBuilder->getAll()
-            ]
-        );
+        return view('admin.sources.sources', [
+            'sourcesList' => $this->sourcesQueryBuilder->getAll()
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -42,7 +45,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        //return view('source.create', [
+        //    'info' => Request()->all()['info'] ?? ''
+        //]);
     }
 
     /**
@@ -53,15 +58,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-
-        $category = new Category();
-        $category->fill($request->only('category'));
-        if ($category->save()) {
-            echo json_encode(['err'=>0, 'msg'=>'category add ok','data'=>$category]);
-        } else {
-            echo json_encode(['err'=>1, 'msg'=>'category not add']);
-        }
-        exit;
+        $name = uniqid();
+        file_put_contents("sourcefile/$name.txt", json_encode($request->only(['info', 'phone', 'email', 'info'])));
+        return response()->json($request->all());
     }
 
     /**
@@ -81,9 +80,11 @@ class CategoryController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Source $source)
     {
-        //
+        return view('admin.sources.create', [
+            'source' => $source
+        ]);
     }
 
     /**
@@ -93,9 +94,17 @@ class CategoryController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Source $source)
     {
-        //
+
+        $source = $source->fill(
+            $request->only(['name', 'url', 'description'])
+        );
+        if ($source->save()) {
+            return \redirect()
+                ->route('admin.sources.index')
+                ->with('success', 'Sources has been update');
+        }
     }
 
     /**
@@ -106,7 +115,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        if (Category::destroy($id)) {
+        if (Source::destroy($id)) {
             echo json_encode(['err' => 0]);
         } else {
             echo json_encode(['err' => 1]);

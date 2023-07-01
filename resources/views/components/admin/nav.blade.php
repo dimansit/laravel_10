@@ -13,6 +13,12 @@
                     Категории
                 </a>
             </li>
+            <li class="nav-item @if(request()->routeIs('admin.sources.index')) active @endif">
+                <a class="nav-link " href="{{ route('admin.sources.index') }}">
+                    <span data-feather="file"></span>
+                    Источники
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

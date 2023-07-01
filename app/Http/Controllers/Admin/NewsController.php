@@ -3,21 +3,39 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\News;
+use App\Queries\CategoriesQueryBuilder;
+use App\Queries\NewsQueryBuilder;
+use App\Queries\QueryBuilder;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class NewsController extends Controller
 {
+
+    protected QueryBuilder $categoriesQueryBuilder;
+    protected QueryBuilder $newsQueryBuilder;
+
+    public function __construct(
+        CategoriesQueryBuilder $categoriesQueryBuilder,
+        NewsQueryBuilder $newsQueryBuilder
+    )
+    {
+        $this->categoriesQueryBuilder = $categoriesQueryBuilder;
+        $this->newsQueryBuilder = $newsQueryBuilder;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function index(): View
     {
         return view('admin.news.news',
             [
-                'newsList'   => $this->getNews(),
-                'categories' => $this->getCategories()
+                'newsList' => $this->newsQueryBuilder->getAll()
             ]
         );
     }
@@ -28,10 +46,12 @@ class NewsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): View
     {
+
         return view('admin.news.create', [
-            'categories' => $this->getCategories()
+            'news'       => null,
+            'categories' => $this->categoriesQueryBuilder->getAll(),
         ]);
     }
 
@@ -43,11 +63,15 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-       // dd($request->all());
-        $request->validate([
-            'title' => ['required', 'string'],
-        ]);
-        return response()->json($request->only(['title', 'author', 'status', 'description']));
+        $news = new News();
+        $news->fill(
+            $request->only(['title', 'author', 'status', 'description', 'category_id'])
+        );
+        if ($news->save()) {
+            return \redirect()
+                ->route('admin.news.index')
+                ->with('success', 'News has been update');
+        }
     }
 
     /**
@@ -56,9 +80,12 @@ class NewsController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(News $news)
     {
-        //
+        //return view('admin.news.create', [
+        //    'news'       => $news,
+        //    'categories' => $this->categoriesQueryBuilder->getAll(),
+        //]);
     }
 
     /**
@@ -67,9 +94,12 @@ class NewsController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(News $news): View
     {
-        //
+        return view('admin.news.create', [
+            'news'       => $news,
+            'categories' => $this->categoriesQueryBuilder->getAll(),
+        ]);
     }
 
     /**
@@ -79,9 +109,16 @@ class NewsController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, News $news)
     {
-        //
+        $news = $news->fill(
+            $request->only(['title', 'author', 'status', 'description', 'category_id'])
+        );
+        if ($news->save()) {
+            return \redirect()
+                ->route('admin.news.index')
+                ->with('success', 'News has been update');
+        }
     }
 
     /**
@@ -92,6 +129,6 @@ class NewsController extends Controller
      */
     public function destroy($id)
     {
-        //
+
     }
 }
