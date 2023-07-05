@@ -12,23 +12,22 @@
 */
 
 
-
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\IndexController as AdminIndexController;
+use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\SourceController as AdminSourceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GreetingController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\NewsController as AdminNewsController;
-use App\Http\Controllers\Admin\IndexController as AdminIndexController;
 use App\Http\Controllers\NewsController as PublicNewsController;
-use App\Http\Controllers\SourceController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'admin', 'as' => 'admin.'], static function() {
+Route::group(['prefix' => 'admin', 'as' => 'admin.'], static function () {
     Route::get('/', AdminIndexController::class)->name('index');
     Route::resource('/categories', AdminCategoryController::class);
+    Route::resource('/sources', AdminSourceController::class);
     Route::resource('/news', AdminNewsController::class);
 });
-
 
 
 Route::get('/',

@@ -2,22 +2,42 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\NewsStatus;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\News\Store;
+use App\Http\Requests\News\Update;
+use App\Models\News;
+use App\Queries\CategoriesQueryBuilder;
+use App\Queries\NewsQueryBuilder;
+use App\Queries\QueryBuilder;
+use Illuminate\View\View;
 
 class NewsController extends Controller
 {
+
+    protected QueryBuilder $categoriesQueryBuilder;
+    protected QueryBuilder $newsQueryBuilder;
+
+    public function __construct(
+        CategoriesQueryBuilder $categoriesQueryBuilder,
+        NewsQueryBuilder $newsQueryBuilder
+    )
+    {
+        $this->categoriesQueryBuilder = $categoriesQueryBuilder;
+        $this->newsQueryBuilder = $newsQueryBuilder;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function index(): View
     {
         return view('admin.news.news',
             [
-                'newsList'   => $this->getNews(),
-                'categories' => $this->getCategories()
+                'newsList' => $this->newsQueryBuilder->getAll()
             ]
         );
     }
@@ -28,10 +48,12 @@ class NewsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): View
     {
         return view('admin.news.create', [
-            'categories' => $this->getCategories()
+            'news'       => null,
+            'categories' => $this->categoriesQueryBuilder->getAll(),
+            'status'     => NewsStatus::all()
         ]);
     }
 
@@ -39,16 +61,21 @@ class NewsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Store $request): \Illuminate\Http\RedirectResponse
     {
-       // dd($request->all());
-        $request->validate([
-            'title' => ['required', 'string'],
-        ]);
-        return response()->json($request->only(['title', 'author', 'status', 'description']));
+        $news = News::create($request->validated());
+        if ($news->save()) {
+            return \redirect()
+                ->route('admin.news.index')
+                ->with('success', 'Новость создана');
+        }
+        return \back()->with('error', 'Новость не соаздана!');
     }
+
+
+
 
     /**
      * Display the specified resource.
@@ -56,9 +83,12 @@ class NewsController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(News $news)
     {
-        //
+        //return view('admin.news.create', [
+        //    'news'       => $news,
+        //    'categories' => $this->categoriesQueryBuilder->getAll(),
+        //]);
     }
 
     /**
@@ -67,9 +97,13 @@ class NewsController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(News $news): View
     {
-        //
+        return view('admin.news.create', [
+            'news'       => $news,
+            'categories' => $this->categoriesQueryBuilder->getAll(),
+            'status'     => NewsStatus::all()
+        ]);
     }
 
     /**
@@ -77,11 +111,19 @@ class NewsController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(Update $request, News $news)
     {
-        //
+        $news = $news->fill(
+            $request->validated()
+        );
+        if ($news->save()) {
+            return \redirect()
+                ->route('admin.news.index')
+                ->with('success', 'News has been update');
+        }
+        return \back()->with('error', 'News not been update');
     }
 
     /**
@@ -92,6 +134,6 @@ class NewsController extends Controller
      */
     public function destroy($id)
     {
-        //
+
     }
 }
