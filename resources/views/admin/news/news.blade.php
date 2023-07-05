@@ -2,6 +2,7 @@
 @section('title') Новости @parent  @stop
 @section('headcontent') - Новости @parent  @stop
 @section('content')
+    @include('components.admin.session')
     <div class="btn-toolbar mb-2 mb-md-0">
         <a class="btn btn-success" href="{{ route('admin.news.create') }}">Добавить новость</a>
     </div>

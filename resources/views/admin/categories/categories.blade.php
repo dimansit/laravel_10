@@ -3,7 +3,7 @@
 @section('headcontent') - Категории@parent  @stop
 
 @section('content')
-    {{route( 'admin.categories.store')}}
+    @include('components.admin.session')
     <div class="input-group" style="margin-bottom: 10px; width: 500px;">
         <input type="text" id="newcategory" class="form-control" placeholder="Новая категория">
         <div class="input-group-append pointer">
@@ -77,21 +77,22 @@
             .then(res => res.json())
             .then(res => {
                 if (res.err == 0) {
+                    document.getElementById('newcategory').value = '';
                     addLineCategory(res.data)
                 } else {
                     alert(res.msg)
                 }
             })
-          //  .catch(e => alert('Ошибка'));
+        //  .catch(e => alert('Ошибка'));
     }
 
     let addLineCategory = (data) => {
-        const  listCategories = document.getElementById('list-categories');
-        listCategories.insertAdjacentHTML('afterbegin',`
+        const listCategories = document.getElementById('list-categories');
+        listCategories.insertAdjacentHTML('afterbegin', `
         <div class="categories" id="${data.id}">
                 <div>
                     ${data.category}
-        </div>
+                </div>
 
         <a class="btn btn-sm btn-success"
            href="#" style="margin-bottom: 10px;">

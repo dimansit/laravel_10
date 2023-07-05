@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Source\Store;
+use App\Http\Requests\Source\Update;
 use App\Models\Source;
 use App\Queries\NewsQueryBuilder;
 use App\Queries\QueryBuilder;
 use App\Queries\SourcesQueryBuilder;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class SourceController extends Controller
@@ -45,22 +46,26 @@ class SourceController extends Controller
      */
     public function create()
     {
-        //return view('source.create', [
-        //    'info' => Request()->all()['info'] ?? ''
-        //]);
+        return view('admin.sources.create',[
+            'source' => null
+        ]);
     }
 
+
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Source $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Store $request): \Illuminate\Http\RedirectResponse
     {
-        $name = uniqid();
-        file_put_contents("sourcefile/$name.txt", json_encode($request->only(['info', 'phone', 'email', 'info'])));
-        return response()->json($request->all());
+        $source = Source::create($request->validated());
+        if ($source->save()) {
+            return \redirect()
+                ->route('admin.sources.index')
+                ->with('success', 'Источник внесен');
+        }
+
+        return \back()->with('error', 'Ошибка при внесении источника');
     }
 
     /**
@@ -87,24 +92,23 @@ class SourceController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Source $source)
-    {
 
+    /**
+     * @param Update $request
+     * @param Source $source
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(Update $request, Source $source): \Illuminate\Http\RedirectResponse
+    {
         $source = $source->fill(
-            $request->only(['name', 'url', 'description'])
+            $request->validated()
         );
         if ($source->save()) {
             return \redirect()
                 ->route('admin.sources.index')
-                ->with('success', 'Sources has been update');
+                ->with('success', 'Информация об источнике обнавлена');
         }
+        return \back()->with('error', 'Ошибка при обновлении информации об источнике');
     }
 
     /**

@@ -2,6 +2,7 @@
 @section('title') Источники новостей @parent  @stop
 @section('headcontent') -  Источники новостей @parent  @stop
 @section('content')
+    @include('components.admin.session')
     <div class="btn-toolbar mb-2 mb-md-0">
         <a class="btn btn-success" href="{{ route('admin.sources.create') }}">Добавить источник</a>
     </div>
