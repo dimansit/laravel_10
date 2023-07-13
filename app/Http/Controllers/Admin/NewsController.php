@@ -115,6 +115,7 @@ class NewsController extends Controller
      */
     public function update(Update $request, News $news)
     {
+
         $news = $news->fill(
             $request->validated()
         );
