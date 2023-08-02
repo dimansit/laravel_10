@@ -16,6 +16,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\IndexController as AdminIndexController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\ParserController;
 use App\Http\Controllers\Admin\SourceController as AdminSourceController;
 use App\Http\Controllers\Admin\UsersController as AdminUsersController;
 use App\Http\Controllers\CategoryController;
@@ -39,9 +40,20 @@ Route::get('/news/',
 )->name('news');
 
 
+Route::group(['middleware' => 'guest'], static function () {
+    Route::get('/{driver}/redirect', [\App\Http\Controllers\SocialProvidersController::class, 'redirect'])
+        ->where('driver', '\w+')
+        ->name('socprovider.redirect');
+
+    Route::get('/{driver}/callback', [\App\Http\Controllers\SocialProvidersController::class, 'callback'])
+        ->where('driver', '\w+')
+        ->name('socprovider.callback');
+});
+
 Route::group(['middleware' => 'auth'], static function () {
-    Route::group(['prefix' => 'account'], static function () {;
-        Route::get('/', AccountController::class);
+    Route::group(['prefix' => 'account'], static function () {
+        ;
+        Route::get('/', AccountController::class)->name('account');
         Route::get('/profile', AccountController::class)
             ->name('account.profile');
     });
@@ -51,6 +63,7 @@ Route::group(['middleware' => 'auth'], static function () {
         'as'         => 'admin.',
         'middleware' => 'check.admin'
     ], static function () {
+        Route::get('/parser', ParserController::class)->name('parser');
         Route::get('/', AdminIndexController::class)->name('index');
         Route::resource('/categories', AdminCategoryController::class);
         Route::resource('/sources', AdminSourceController::class);
