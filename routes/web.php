@@ -12,23 +12,18 @@
 */
 
 
-
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\IndexController as AdminIndexController;
+use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\ParserController;
+use App\Http\Controllers\Admin\SourceController as AdminSourceController;
+use App\Http\Controllers\Admin\UsersController as AdminUsersController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GreetingController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\NewsController as AdminNewsController;
-use App\Http\Controllers\Admin\IndexController as AdminIndexController;
 use App\Http\Controllers\NewsController as PublicNewsController;
-use App\Http\Controllers\SourceController;
 use Illuminate\Support\Facades\Route;
-
-Route::group(['prefix' => 'admin', 'as' => 'admin.'], static function() {
-    Route::get('/', AdminIndexController::class)->name('index');
-    Route::resource('/categories', AdminCategoryController::class);
-    Route::resource('/news', AdminNewsController::class);
-});
-
 
 
 Route::get('/',
@@ -43,6 +38,39 @@ Route::get('/news/',
         PublicNewsController::class, 'index'
     ]
 )->name('news');
+
+
+Route::group(['middleware' => 'guest'], static function () {
+    Route::get('/{driver}/redirect', [\App\Http\Controllers\SocialProvidersController::class, 'redirect'])
+        ->where('driver', '\w+')
+        ->name('socprovider.redirect');
+
+    Route::get('/{driver}/callback', [\App\Http\Controllers\SocialProvidersController::class, 'callback'])
+        ->where('driver', '\w+')
+        ->name('socprovider.callback');
+});
+
+Route::group(['middleware' => 'auth'], static function () {
+    Route::group(['prefix' => 'account'], static function () {
+        ;
+        Route::get('/', AccountController::class)->name('account');
+        Route::get('/profile', AccountController::class)
+            ->name('account.profile');
+    });
+
+    Route::group([
+        'prefix'     => 'admin',
+        'as'         => 'admin.',
+        'middleware' => 'check.admin'
+    ], static function () {
+        Route::get('/parser', ParserController::class)->name('parser');
+        Route::get('/', AdminIndexController::class)->name('index');
+        Route::resource('/categories', AdminCategoryController::class);
+        Route::resource('/sources', AdminSourceController::class);
+        Route::resource('/news', AdminNewsController::class);
+        Route::resource('/users', AdminUsersController::class);
+    });
+});
 
 Route::get('/news/category/{category}',
     [
@@ -80,9 +108,9 @@ Route::get('/login',
 )->name('login');
 
 
-Route::get('/{page}', function ($page) {
-    return view($page);
-});
+//Route::get('/{page}', function ($page) {
+//    return view($page);
+//});
 
 
 Route::post('/source/store',
@@ -92,4 +120,6 @@ Route::post('/source/store',
 )->name('source.store');;
 
 
+Auth::routes();
 
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
