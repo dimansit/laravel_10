@@ -33,5 +33,7 @@
         </main>
     </div>
 </div>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+@stack('js')
 </body>
 </html>

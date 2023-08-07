@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Source\Store;
 use App\Http\Requests\Source\Update;
+use App\Jobs\NewsParsing;
 use App\Models\Source;
 use App\Queries\NewsQueryBuilder;
 use App\Queries\QueryBuilder;
@@ -60,6 +61,9 @@ class SourceController extends Controller
     {
         $source = Source::create($request->validated());
         if ($source->save()) {
+
+            dispatch(new NewsParsing($source->url));
+
             return \redirect()
                 ->route('admin.sources.index')
                 ->with('success', 'Источник внесен');

@@ -64,11 +64,14 @@ Route::group(['middleware' => 'auth'], static function () {
         'middleware' => 'check.admin'
     ], static function () {
         Route::get('/parser', ParserController::class)->name('parser');
+
         Route::get('/', AdminIndexController::class)->name('index');
         Route::resource('/categories', AdminCategoryController::class);
         Route::resource('/sources', AdminSourceController::class);
+        Route::resource('/sources/parse', AdminSourceController::class,);
         Route::resource('/news', AdminNewsController::class);
         Route::resource('/users', AdminUsersController::class);
+       // Route::resource('/sources', 'FooController');
     });
 });
 

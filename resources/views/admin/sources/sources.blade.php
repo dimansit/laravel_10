@@ -25,6 +25,11 @@
                    onclick="delSource( {{$source->id}})" style="margin-bottom: 10px;">
                     Удалить источник
                 </a>
+                <a class="btn btn-sm btn-danger"
+                   href="#"
+                   onclick="parseSource( {{$source->id}})" style="margin-bottom: 10px;">
+                    Загрузить новости с источника в базу
+                </a>
             </div>
             <div><strong>{{$source->url}}</strong></div>
         </div>
@@ -39,6 +44,22 @@
 @stop
 <script>
 
+    let parseSource = (sourceId) => {
+        let data = new FormData();
+        data.append('id', sourceId);
+
+        data.append('_token', document.getElementsByName('_token')[0].value);
+        fetch(`/admin/sources/parse`, {
+
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.err == 0) {
+                    document.getElementById(sourceId).remove();
+                }
+            })
+            .catch(e => alert(e.message));
+    }
 
     let delSource = (sourceId) => {
         if (confirm('Вы точно хотите удалить источник информации!')) {

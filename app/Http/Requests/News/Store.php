@@ -30,6 +30,7 @@ class Store extends FormRequest
             'author'      => 'required|string|min:4|max:50',
             'status'      => "required|in:".implode(',', $newsStatus),
             'description' => 'required|string',
+            'image' => 'sometimes|image|mimes:jpg,bmp,png',
             'category_id' => "required|exists:{$category},id",
         ];
     }

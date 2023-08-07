@@ -72,8 +72,18 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="img">Картинка к новости:</label>
+            <img style="width: 100px;" src="{{ Storage::disk('public')->url($news->image) }}" alt="Изображение к новости">
             <input class="form-control" type="file" id="img" name="img">
         </div>
         <button type="submit" class="btn btn-success">Cохранить новость</button>
     </form>
+    @push('js')
+        <script>
+            ClassicEditor
+                .create(document.querySelector('#description'))
+                .catch(error => {
+                    console.error(error);
+                });
+        </script>
+    @endpush
 @stop

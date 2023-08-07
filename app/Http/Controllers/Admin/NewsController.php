@@ -10,6 +10,8 @@ use App\Models\News;
 use App\Queries\CategoriesQueryBuilder;
 use App\Queries\NewsQueryBuilder;
 use App\Queries\QueryBuilder;
+use App\Services\Contracts\Upload;
+use App\Services\UploadService;
 use Illuminate\View\View;
 
 class NewsController extends Controller
@@ -75,8 +77,6 @@ class NewsController extends Controller
     }
 
 
-
-
     /**
      * Display the specified resource.
      *
@@ -112,9 +112,13 @@ class NewsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param int $id
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
-    public function update(Update $request, News $news)
+    public function update(Update $request, News $news, Upload $upload): \Illuminate\Http\RedirectResponse
     {
+        if ($request->hasFile('img')) {
+            $news['image'] = $upload->create($request->file('img'));
+        }
 
         $news = $news->fill(
             $request->validated()
